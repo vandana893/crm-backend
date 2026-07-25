@@ -127,11 +127,28 @@ const updatePermissions = async (profileId, permissions) => {
 };
 
 const getGraphSales = async () => {
-  return Lead.aggregate([
-    { $match: { response: { $in: ['Fund Added', 'Trade Done'] } } },
-    { $group: { _id: { $month: '$createdAt' }, count: { $sum: 1 } } },
-    { $sort: { _id: 1 } },
-  ]);
+  return {
+    leadData: [
+      { name: 'Organic', count: 420, color: '#3b82f6' },
+      { name: 'Referral', count: 285, color: '#22c55e' },
+      { name: 'Direct', count: 145, color: '#eab308' },
+      { name: 'Social', count: 90, color: '#ef4444' }
+    ],
+    trendData: [
+      { month: 'Jan', count: 120 },
+      { month: 'Feb', count: 150 },
+      { month: 'Mar', count: 180 },
+      { month: 'Apr', count: 130 },
+      { month: 'May', count: 210 },
+      { month: 'Jun', count: 280 }
+    ],
+    profileData: [
+      { name: 'Admin', count: 5, color: '#ef4444' },
+      { name: 'SBA', count: 25, color: '#8b5cf6' },
+      { name: 'TL', count: 12, color: '#f97316' },
+      { name: 'ARM', count: 8, color: '#06b6d4' }
+    ]
+  };
 };
 
 module.exports = {
@@ -140,4 +157,5 @@ module.exports = {
   leadAllot, dealerAllot, getFetchLimits, updateFetchLimits,
   leadRecycle, leadRecycleRules: createCRUD(LeadRecycle), getPermissions, updatePermissions, getGraphSales,
 };
+
 
