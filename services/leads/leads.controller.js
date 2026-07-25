@@ -1,0 +1,153 @@
+const leadsRepository = require('./leads.repository');
+const { successResponse, errorResponse, createdResponse } = require('../../utils/apiResponse');
+const { getPagination, getPaginationMeta } = require('../../utils/pagination');
+
+// GET /api/leads
+const getLeads = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = getPagination(req.query);
+    const filters = {};
+
+    if (req.query.response) filters.response = req.query.response;
+    if (req.query.source) filters.source = req.query.source;
+    if (req.query.type) filters.type = req.query.type;
+    if (req.query.owner) filters.owner = req.query.owner;
+    if (req.query.mobile) filters.mobile = { $regex: req.query.mobile, $options: 'i' };
+    if (req.query.fromDate && req.query.toDate) {
+      filters.createdAt = { $gte: new Date(req.query.fromDate), $lte: new Date(req.query.toDate) };
+    }
+
+    const { leads, total } = await leadsRepository.findAll(filters, { skip, limit });
+    const pagination = getPaginationMeta(page, limit, total);
+
+    return successResponse(res, 'Leads fetched successfully', leads, 200, pagination);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/leads/:id
+const getLeadById = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.findById(req.params.id);
+    if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    return successResponse(res, 'Lead fetched', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/leads
+const createLead = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.create(req.body);
+    return createdResponse(res, 'Lead created successfully', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/leads/:id
+const updateLead = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.updateById(req.params.id, req.body);
+    if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    return successResponse(res, 'Lead updated successfully', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PATCH /api/leads/:id/comment
+const updateComment = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.updateComment(req.params.id, req.body.comment);
+    if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    return successResponse(res, 'Comment updated', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PATCH /api/leads/:id/response
+const updateLeadResponse = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.updateResponse(req.params.id, req.body.response);
+    if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    return successResponse(res, 'Response updated', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE /api/leads/:id
+const deleteLead = async (req, res, next) => {
+  try {
+    const lead = await leadsRepository.updateById(req.params.id, { isBlocked: true });
+    if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    return successResponse(res, 'Lead blocked successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/leads/followup
+const getFollowups = async (req, res, next) => {
+  try {
+    const leads = await leadsRepository.findFollowups();
+    return successResponse(res, 'Follow-up leads fetched', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/leads/disposed
+const getDisposed = async (req, res, next) => {
+  try {
+    const leads = await leadsRepository.findDisposed();
+    return successResponse(res, 'Disposed leads fetched', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/leads/repeat
+const getRepeat = async (req, res, next) => {
+  try {
+    const leads = await leadsRepository.findRepeat();
+    return successResponse(res, 'Repeat leads fetched', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/leads/hot
+const getHotLeads = async (req, res, next) => {
+  try {
+    const leads = await leadsRepository.findHotLeads();
+    return successResponse(res, 'Hot leads fetched', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/leads/export
+const exportLeads = async (req, res, next) => {
+  try {
+    const leads = await leadsRepository.findByFilters(req.body);
+    return successResponse(res, 'Leads exported', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getLeads, getLeadById, createLead, updateLead,
+  updateComment, updateLeadResponse, deleteLead,
+  getFollowups, getDisposed, getRepeat, getHotLeads, exportLeads,
+};
