@@ -6,6 +6,6 @@ const leadStatusSchema = new mongoose.Schema({
   colorCode: { type: String, default: '#000000' },
   sortOrder: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('LeadStatus', leadStatusSchema);

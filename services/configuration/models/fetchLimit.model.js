@@ -5,6 +5,6 @@ const fetchLimitSchema = new mongoose.Schema({
   limit: { type: Number, required: true, default: 0 },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('FetchLimit', fetchLimitSchema);

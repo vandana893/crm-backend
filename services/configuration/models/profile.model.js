@@ -13,6 +13,6 @@ const profileSchema = new mongoose.Schema({
     chatting: { type: Boolean, default: false },
   },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Profile', profileSchema);

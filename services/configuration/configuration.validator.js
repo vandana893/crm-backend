@@ -33,7 +33,7 @@ const leadSourceRules = [
 
 const departmentRules = [
   body('name').notEmpty().withMessage('Department name is required').trim(),
-  body('head').optional().isMongoId(),
+  body('head').optional().isString(),
 ];
 
 const profileRules = [
@@ -44,24 +44,24 @@ const employeeRules = [
   body('name').notEmpty().withMessage('Employee name is required').trim(),
   body('email').optional().isEmail(),
   body('phone').optional().isString(),
-  body('profile').optional().isMongoId(),
-  body('department').optional().isMongoId(),
+  body('profile').optional().isString(),
+  body('department').optional().isString(),
 ];
 
 const teamRules = [
   body('name').notEmpty().withMessage('Team name is required').trim(),
-  body('leader').optional().isMongoId(),
+  body('leader').optional().isString(),
   body('members').optional().isArray(),
 ];
 
 const leadAllotRules = [
   body('leadIds').isArray({ min: 1 }).withMessage('At least one lead is required'),
-  body('employeeId').notEmpty().isMongoId().withMessage('Valid employee ID is required'),
+  body('employeeId').notEmpty().isString().withMessage('Valid employee ID is required'),
 ];
 
 const dealerAllotRules = [
   body('leadIds').isArray({ min: 1 }).withMessage('At least one lead is required'),
-  body('dealerId').notEmpty().isMongoId().withMessage('Valid dealer ID is required'),
+  body('dealerId').notEmpty().isString().withMessage('Valid dealer ID is required'),
 ];
 
 const fetchLimitRules = [
@@ -69,12 +69,12 @@ const fetchLimitRules = [
 ];
 
 const permissionRules = [
-  body('profileId').notEmpty().isMongoId().withMessage('Valid profile ID is required'),
+  body('profileId').notEmpty().isString().withMessage('Valid profile ID is required'),
   body('permissions').isObject().withMessage('Permissions object is required'),
 ];
 
 const idParamRule = [
-  param('id').isMongoId().withMessage('Invalid ID'),
+  param('id').isString().withMessage('Invalid ID'),
 ];
 
 module.exports = {

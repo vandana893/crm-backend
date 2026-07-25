@@ -5,6 +5,6 @@ const departmentSchema = new mongoose.Schema({
   description: { type: String, trim: true },
   head: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Department', departmentSchema);

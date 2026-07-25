@@ -32,7 +32,62 @@ const leadStatuses = createCRUD(LeadStatus);
 const leadSources = createCRUD(LeadSource);
 const departments = createCRUD(Department, 'head');
 const profiles = createCRUD(Profile);
-const employees = createCRUD(Employee, 'profile department team user');
+const employees = {
+  findAll: async (filters = {}) => Employee.find(filters).populate('department team user').sort({ createdAt: -1 }),
+  findById: async (id) => Employee.findById(id).populate('department team user'),
+  create: async (data) => {
+    // Determine the role for the User (mapping from Employee role/profile if necessary)
+    const roleMapping = {
+      'admin': 'Admin',
+      'manager': 'Manager',
+      'sba': 'SBA',
+      'tl': 'TL',
+      'arm': 'ARM'
+    };
+    const userRole = roleMapping[data.profile?.toLowerCase()] || roleMapping[data.role?.toLowerCase()] || 'SBA';
+    
+    // Create corresponding User for login
+    const User = require('../auth/auth.model');
+    const newUser = await User.create({
+      name: data.name,
+      email: data.email || `${data.username || data.name.replace(/\s+/g, '')}@company.com`,
+      password: data.password || 'password123',
+      role: userRole,
+      phone: data.mobile || data.phone,
+      isActive: data.status === 'Active' ? true : data.isActive !== false,
+    });
+    
+    data.user = newUser._id;
+    return Employee.create(data);
+  },
+  updateById: async (id, data) => {
+    const employee = await Employee.findById(id);
+    if (employee && employee.user) {
+      const User = require('../auth/auth.model');
+      const updateData = {};
+      if (data.name) updateData.name = data.name;
+      if (data.email) updateData.email = data.email;
+      if (data.password) updateData.password = data.password; // Note: In a real app we'd hash it, User model has a pre-save hook for password but findByIdAndUpdate bypasses it. We should use findById and save.
+      if (data.status) updateData.isActive = data.status === 'Active';
+      if (data.mobile) updateData.phone = data.mobile;
+      
+      const user = await User.findById(employee.user);
+      if (user) {
+        Object.assign(user, updateData);
+        await user.save(); // triggers password hash if changed
+      }
+    }
+    return Employee.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+  },
+  deleteById: async (id) => {
+    const employee = await Employee.findById(id);
+    if (employee && employee.user) {
+      const User = require('../auth/auth.model');
+      await User.findByIdAndDelete(employee.user);
+    }
+    return Employee.findByIdAndDelete(id);
+  }
+};
 const teams = createCRUD(Team, 'leader members department');
 
 // ─── Special Operations ──────────────────────────────────────────────

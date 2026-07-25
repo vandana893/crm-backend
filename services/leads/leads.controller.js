@@ -87,10 +87,10 @@ const updateLeadResponse = async (req, res, next) => {
 // DELETE /api/leads/:id
 const deleteLead = async (req, res, next) => {
   try {
-    const lead = await leadsRepository.updateById(req.params.id, { isBlocked: true });
+    const lead = await leadsRepository.deleteById(req.params.id);
     if (!lead) return errorResponse(res, 'Lead not found', 404);
 
-    return successResponse(res, 'Lead blocked successfully');
+    return successResponse(res, 'Lead deleted successfully');
   } catch (error) {
     next(error);
   }

@@ -8,6 +8,6 @@ const brokerSchema = new mongoose.Schema({
   email: { type: String, trim: true, lowercase: true },
   address: { type: String, trim: true },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Broker', brokerSchema);

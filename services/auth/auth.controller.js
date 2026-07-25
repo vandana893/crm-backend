@@ -7,7 +7,7 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await authRepository.findByEmail(email);
+    const user = await authRepository.findByEmailOrUsername(email);
     if (!user) {
       return errorResponse(res, 'Invalid email or password', 401);
     }

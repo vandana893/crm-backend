@@ -7,6 +7,6 @@ const templateSchema = new mongoose.Schema({
   variables: [{ type: String }],
   isActive: { type: Boolean, default: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Template', templateSchema);

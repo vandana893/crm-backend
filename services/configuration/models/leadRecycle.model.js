@@ -5,6 +5,6 @@ const leadRecycleSchema = new mongoose.Schema({
   recycledCount: { type: Number, default: 0 },
   recycledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: { type: String, enum: ['Pending', 'Completed', 'Failed'], default: 'Completed' },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('LeadRecycle', leadRecycleSchema);

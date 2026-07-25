@@ -9,6 +9,6 @@ const companySchema = new mongoose.Schema({
   logo: { type: String },
   gst: { type: String, trim: true },
   pan: { type: String, trim: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Company', companySchema);

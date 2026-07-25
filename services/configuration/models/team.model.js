@@ -6,6 +6,6 @@ const teamSchema = new mongoose.Schema({
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
   isActive: { type: Boolean, default: true },
-}, { timestamps: true });
+}, { timestamps: true, strict: false });
 
 module.exports = mongoose.model('Team', teamSchema);
