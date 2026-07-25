@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const brokerSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
-  code: { type: String, unique: true, trim: true },
+  code: { type: String, trim: true },
   contactPerson: { type: String, trim: true },
   phone: { type: String, trim: true },
   email: { type: String, trim: true, lowercase: true },

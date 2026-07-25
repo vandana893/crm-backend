@@ -126,5 +126,6 @@ module.exports = {
   brokerHandlers, templateHandlers, leadResponseHandlers, leadStatusHandlers,
   leadSourceHandlers, departmentHandlers, profileHandlers, employeeHandlers, teamHandlers,
   allotLeads, allotDealers, getFetchLimit, updateFetchLimit,
-  recycleLeads, getPermissions, updatePermissions, getGraphSales,
+  recycleLeads, leadRecycleRulesHandlers: makeCRUDHandlers(repo.leadRecycleRules, 'Lead Recycle Rule'), getPermissions, updatePermissions, getGraphSales,
 };
+

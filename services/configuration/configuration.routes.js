@@ -26,15 +26,17 @@ registerCRUD('/departments', ctrl.departmentHandlers, v.departmentRules);
 registerCRUD('/profiles', ctrl.profileHandlers, v.profileRules);
 registerCRUD('/employees', ctrl.employeeHandlers, v.employeeRules);
 registerCRUD('/teams', ctrl.teamHandlers, v.teamRules);
+registerCRUD('/lead-recycle', ctrl.leadRecycleRulesHandlers, []);
 
 // ─── Special Operations ──────────────────────────────────────────────
 router.post('/lead-allot', auth, v.leadAllotRules, validate, ctrl.allotLeads);
 router.post('/dealer-allot', auth, v.dealerAllotRules, validate, ctrl.allotDealers);
 router.get('/fetch-limit', auth, ctrl.getFetchLimit);
 router.put('/fetch-limit', auth, v.fetchLimitRules, validate, ctrl.updateFetchLimit);
-router.post('/lead-recycle', auth, ctrl.recycleLeads);
+router.post('/lead-recycle-action', auth, ctrl.recycleLeads);
 router.get('/permissions', auth, ctrl.getPermissions);
 router.put('/permissions', auth, v.permissionRules, validate, ctrl.updatePermissions);
 router.get('/graph-sales', auth, ctrl.getGraphSales);
 
 module.exports = router;
+

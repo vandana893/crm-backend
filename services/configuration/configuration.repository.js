@@ -9,6 +9,7 @@ const Profile = require('./models/profile.model');
 const Employee = require('./models/employee.model');
 const Team = require('./models/team.model');
 const Lead = require('../leads/leads.model');
+const LeadRecycle = require('./models/leadRecycle.model');
 
 // ─── Generic CRUD Factory ───────────────────────────────────────────
 const createCRUD = (Model, populateFields = '') => ({
@@ -137,5 +138,6 @@ module.exports = {
   company, brokers, templates, leadResponses, leadStatuses, leadSources,
   departments, profiles, employees, teams,
   leadAllot, dealerAllot, getFetchLimits, updateFetchLimits,
-  leadRecycle, getPermissions, updatePermissions, getGraphSales,
+  leadRecycle, leadRecycleRules: createCRUD(LeadRecycle), getPermissions, updatePermissions, getGraphSales,
 };
+
