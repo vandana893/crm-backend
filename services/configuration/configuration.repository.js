@@ -10,6 +10,7 @@ const Employee = require('./models/employee.model');
 const Team = require('./models/team.model');
 const Lead = require('../leads/leads.model');
 const LeadRecycle = require('./models/leadRecycle.model');
+const FetchLimit = require('./models/fetchLimit.model');
 
 // ─── Generic CRUD Factory ───────────────────────────────────────────
 const createCRUD = (Model, populateFields = '') => ({
@@ -72,7 +73,7 @@ const employees = {
       if (data.status) updateData.isActive = data.status === 'Active';
       if (data.mobile) updateData.phone = data.mobile;
       
-      const user = await User.findById(employee.user);
+      const user = await User.findById(employee.user).select('+password');
       if (user) {
         Object.assign(user, updateData);
         await user.save(); // triggers password hash if changed
@@ -92,12 +93,33 @@ const employees = {
 const teams = createCRUD(Team, 'leader members department');
 
 // ─── Special Operations ──────────────────────────────────────────────
-const leadAllot = async (leadIds, employeeId) => {
-  return Lead.updateMany({ _id: { $in: leadIds } }, { owner: employeeId });
+const leadAllot = async ({ count, source, profile, employeeId }) => {
+  const query = { owner: null };
+  if (source) query.source = source;
+  
+  const leads = await Lead.find(query).limit(Number(count)).select('_id');
+  const leadIds = leads.map(l => l._id);
+  if (leadIds.length === 0) return { modifiedCount: 0 };
+  
+  const update = {};
+  if (employeeId) update.owner = employeeId;
+  return Lead.updateMany({ _id: { $in: leadIds } }, { $set: update });
 };
 
-const dealerAllot = async (leadIds, dealerId) => {
-  return Lead.updateMany({ _id: { $in: leadIds } }, { dealer: dealerId });
+const dealerAllot = async ({ count, profile, dealerId, unAllot }) => {
+  const query = {};
+  if (unAllot) {
+    query.dealer = { $ne: null };
+    if (dealerId) query.dealer = dealerId;
+  } else {
+    query.dealer = null;
+  }
+  
+  const leads = await Lead.find(query).limit(Number(count)).select('_id');
+  const leadIds = leads.map(l => l._id);
+  if (leadIds.length === 0) return { modifiedCount: 0 };
+  
+  return Lead.updateMany({ _id: { $in: leadIds } }, { $set: { dealer: unAllot ? null : dealerId } });
 };
 
 const getFetchLimits = async () => {
@@ -156,6 +178,7 @@ module.exports = {
   departments, profiles, employees, teams,
   leadAllot, dealerAllot, getFetchLimits, updateFetchLimits,
   leadRecycle, leadRecycleRules: createCRUD(LeadRecycle), getPermissions, updatePermissions, getGraphSales,
+  fetchLimits: createCRUD(FetchLimit),
 };
 
 

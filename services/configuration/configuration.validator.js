@@ -55,13 +55,16 @@ const teamRules = [
 ];
 
 const leadAllotRules = [
-  body('leadIds').isArray({ min: 1 }).withMessage('At least one lead is required'),
-  body('employeeId').notEmpty().isString().withMessage('Valid employee ID is required'),
+  body('count').isInt({ min: 1 }).withMessage('Count must be at least 1'),
+  body('source').optional().isString(),
+  body('profile').optional().isString(),
+  body('employeeId').optional().isString(),
 ];
 
 const dealerAllotRules = [
-  body('leadIds').isArray({ min: 1 }).withMessage('At least one lead is required'),
-  body('dealerId').notEmpty().isString().withMessage('Valid dealer ID is required'),
+  body('count').isInt({ min: 1 }).withMessage('Count must be at least 1'),
+  body('profile').optional().isString(),
+  body('dealerId').optional().isString(),
 ];
 
 const fetchLimitRules = [
@@ -70,7 +73,7 @@ const fetchLimitRules = [
 
 const permissionRules = [
   body('profileId').notEmpty().isString().withMessage('Valid profile ID is required'),
-  body('permissions').isObject().withMessage('Permissions object is required'),
+  body('permissions').custom(value => typeof value === 'object' && value !== null).withMessage('Permissions object/array is required'),
 ];
 
 const idParamRule = [

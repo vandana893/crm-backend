@@ -46,6 +46,7 @@ app.use('/api/configuration', require('./services/configuration/configuration.ro
 app.use('/api/reports',       require('./services/reports/reports.routes'));
 app.use('/api/noticeboard',   require('./services/noticeboard/noticeboard.routes'));
 app.use('/api/mailing',       require('./services/internal-mailing/mailing.routes'));
+app.use('/api/mail',          require('./services/mail/mail.routes'));
 app.use('/api/chatting',      require('./services/chatting/chatting.routes'));
 app.use('/api/profile',       require('./services/profile/profile.routes'));
 

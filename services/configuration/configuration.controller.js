@@ -48,6 +48,7 @@ const departmentHandlers  = makeCRUDHandlers(repo.departments, 'Department');
 const profileHandlers     = makeCRUDHandlers(repo.profiles, 'Profile');
 const employeeHandlers    = makeCRUDHandlers(repo.employees, 'Employee');
 const teamHandlers        = makeCRUDHandlers(repo.teams, 'Team');
+const fetchLimitHandlers  = makeCRUDHandlers(repo.fetchLimits, 'Fetch Limit');
 
 // ─── Company (single entity) ─────────────────────────────────────────
 const getCompany = async (req, res, next) => {
@@ -67,14 +68,14 @@ const updateCompany = async (req, res, next) => {
 // ─── Special Operations ──────────────────────────────────────────────
 const allotLeads = async (req, res, next) => {
   try {
-    const result = await repo.leadAllot(req.body.leadIds, req.body.employeeId);
+    const result = await repo.leadAllot(req.body);
     return successResponse(res, 'Leads allotted successfully', { modified: result.modifiedCount });
   } catch (error) { next(error); }
 };
 
 const allotDealers = async (req, res, next) => {
   try {
-    const result = await repo.dealerAllot(req.body.leadIds, req.body.dealerId);
+    const result = await repo.dealerAllot(req.body);
     return successResponse(res, 'Dealers allotted successfully', { modified: result.modifiedCount });
   } catch (error) { next(error); }
 };
@@ -124,8 +125,7 @@ const getGraphSales = async (req, res, next) => {
 module.exports = {
   getCompany, updateCompany,
   brokerHandlers, templateHandlers, leadResponseHandlers, leadStatusHandlers,
-  leadSourceHandlers, departmentHandlers, profileHandlers, employeeHandlers, teamHandlers,
+  leadSourceHandlers, departmentHandlers, profileHandlers, employeeHandlers, teamHandlers, fetchLimitHandlers,
   allotLeads, allotDealers, getFetchLimit, updateFetchLimit,
   recycleLeads, leadRecycleRulesHandlers: makeCRUDHandlers(repo.leadRecycleRules, 'Lead Recycle Rule'), getPermissions, updatePermissions, getGraphSales,
 };
-

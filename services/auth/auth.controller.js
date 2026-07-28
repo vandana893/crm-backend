@@ -17,7 +17,7 @@ const login = async (req, res, next) => {
       return errorResponse(res, 'Invalid email or password', 401);
     }
 
-    const token = generateToken({ id: user._id, role: user.role, name: user.name });
+    const token = generateToken({ id: user._id, role: user.role, name: user.name, email: user.email });
 
     return successResponse(res, 'Login successful', {
       token,
@@ -33,7 +33,7 @@ const register = async (req, res, next) => {
   try {
     const user = await authRepository.create(req.body);
 
-    const token = generateToken({ id: user._id, role: user.role, name: user.name });
+    const token = generateToken({ id: user._id, role: user.role, name: user.name, email: user.email });
 
     return createdResponse(res, 'User registered successfully', {
       token,

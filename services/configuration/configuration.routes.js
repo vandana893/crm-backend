@@ -31,12 +31,10 @@ registerCRUD('/lead-recycle', ctrl.leadRecycleRulesHandlers, []);
 // ─── Special Operations ──────────────────────────────────────────────
 router.post('/lead-allot', auth, v.leadAllotRules, validate, ctrl.allotLeads);
 router.post('/dealer-allot', auth, v.dealerAllotRules, validate, ctrl.allotDealers);
-router.get('/fetch-limit', auth, ctrl.getFetchLimit);
-router.put('/fetch-limit', auth, v.fetchLimitRules, validate, ctrl.updateFetchLimit);
+registerCRUD('/fetch-limit', ctrl.fetchLimitHandlers, []);
 router.post('/lead-recycle-action', auth, ctrl.recycleLeads);
 router.get('/permissions', auth, ctrl.getPermissions);
 router.put('/permissions', auth, v.permissionRules, validate, ctrl.updatePermissions);
 router.get('/graph-sales', auth, ctrl.getGraphSales);
 
 module.exports = router;
-
