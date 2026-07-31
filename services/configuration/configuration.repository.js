@@ -11,6 +11,7 @@ const Team = require('./models/team.model');
 const Lead = require('../leads/leads.model');
 const LeadRecycle = require('./models/leadRecycle.model');
 const FetchLimit = require('./models/fetchLimit.model');
+const GraphConfig = require('./models/graphConfig.model');
 
 // ─── Generic CRUD Factory ───────────────────────────────────────────
 const createCRUD = (Model, populateFields = '') => ({
@@ -179,6 +180,7 @@ module.exports = {
   leadAllot, dealerAllot, getFetchLimits, updateFetchLimits,
   leadRecycle, leadRecycleRules: createCRUD(LeadRecycle), getPermissions, updatePermissions, getGraphSales,
   fetchLimits: createCRUD(FetchLimit),
+  graphConfigs: createCRUD(GraphConfig),
 };
 
 

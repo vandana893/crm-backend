@@ -49,6 +49,7 @@ const profileHandlers     = makeCRUDHandlers(repo.profiles, 'Profile');
 const employeeHandlers    = makeCRUDHandlers(repo.employees, 'Employee');
 const teamHandlers        = makeCRUDHandlers(repo.teams, 'Team');
 const fetchLimitHandlers  = makeCRUDHandlers(repo.fetchLimits, 'Fetch Limit');
+const graphConfigHandlers = makeCRUDHandlers(repo.graphConfigs, 'Graph Config');
 
 // ─── Company (single entity) ─────────────────────────────────────────
 const getCompany = async (req, res, next) => {
@@ -125,7 +126,7 @@ const getGraphSales = async (req, res, next) => {
 module.exports = {
   getCompany, updateCompany,
   brokerHandlers, templateHandlers, leadResponseHandlers, leadStatusHandlers,
-  leadSourceHandlers, departmentHandlers, profileHandlers, employeeHandlers, teamHandlers, fetchLimitHandlers,
+  leadSourceHandlers, departmentHandlers, profileHandlers, employeeHandlers, teamHandlers, fetchLimitHandlers, graphConfigHandlers,
   allotLeads, allotDealers, getFetchLimit, updateFetchLimit,
   recycleLeads, leadRecycleRulesHandlers: makeCRUDHandlers(repo.leadRecycleRules, 'Lead Recycle Rule'), getPermissions, updatePermissions, getGraphSales,
 };

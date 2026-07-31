@@ -27,6 +27,7 @@ registerCRUD('/profiles', ctrl.profileHandlers, v.profileRules);
 registerCRUD('/employees', ctrl.employeeHandlers, v.employeeRules);
 registerCRUD('/teams', ctrl.teamHandlers, v.teamRules);
 registerCRUD('/lead-recycle', ctrl.leadRecycleRulesHandlers, []);
+registerCRUD('/graph-configs', ctrl.graphConfigHandlers, []);
 
 // ─── Special Operations ──────────────────────────────────────────────
 router.post('/lead-allot', auth, v.leadAllotRules, validate, ctrl.allotLeads);
