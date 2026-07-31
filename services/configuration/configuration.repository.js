@@ -150,6 +150,22 @@ const updatePermissions = async (profileId, permissions) => {
 };
 
 const getGraphSales = async () => {
+  const profileAgg = await Employee.aggregate([
+    { $match: { profile: { $exists: true, $ne: null, $ne: '' } } },
+    { $group: { _id: '$profile', count: { $sum: 1 } } }
+  ]);
+
+  const colors = ['#ef4444', '#8b5cf6', '#f97316', '#06b6d4', '#10b981', '#3b82f6', '#ec4899'];
+  const dynamicProfileData = profileAgg.map((item, index) => ({
+    name: item._id,
+    count: item.count,
+    color: colors[index % colors.length]
+  }));
+
+  if (dynamicProfileData.length === 0) {
+    dynamicProfileData.push({ name: 'No Data', count: 1, color: '#d1d5db' });
+  }
+
   return {
     leadData: [
       { name: 'Organic', count: 420, color: '#3b82f6' },
@@ -165,12 +181,7 @@ const getGraphSales = async () => {
       { month: 'May', count: 210 },
       { month: 'Jun', count: 280 }
     ],
-    profileData: [
-      { name: 'Admin', count: 5, color: '#ef4444' },
-      { name: 'SBA', count: 25, color: '#8b5cf6' },
-      { name: 'TL', count: 12, color: '#f97316' },
-      { name: 'ARM', count: 8, color: '#06b6d4' }
-    ]
+    profileData: dynamicProfileData
   };
 };
 
