@@ -29,8 +29,6 @@ try {
 
 const connectDB = async () => {
   try {
-    console.log("MONGO_URI:", process.env.MONGO_URI);
-
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
@@ -38,10 +36,21 @@ const connectDB = async () => {
     });
     
     console.log(`✅ MongoDB Cluster Connected: ${conn.connection.host}`);
+    
+    mongoose.connection.on('disconnected', () => {
+      console.warn('⚠️ MongoDB disconnected! Attempting to reconnect...');
+    });
+    
+    mongoose.connection.on('error', (err) => {
+      console.error(`❌ MongoDB Connection Error: ${err.message}`);
+    });
+    
   } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    console.dir(error, { depth: null });
-    process.exit(1);
+    console.error(`❌ MongoDB Initial Connection Error: ${error.message}`);
+    // Delay exit to allow logging to complete, or let a process manager handle restarts
+    setTimeout(() => {
+      process.exit(1);
+    }, 1000);
   }
 };
 

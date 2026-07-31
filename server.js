@@ -63,10 +63,23 @@ app.use(errorHandler);
 
 // ─── Start Server ────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n🚀 CRM Backend Server running on port ${PORT}`);
   console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
+});
 
+// ─── Process Error Handlers ───────────────────────────────────────────
+process.on('unhandledRejection', (err, promise) => {
+  console.error(`❌ [Unhandled Rejection] Error: ${err.message}`);
+  // Do not crash the entire server in production on minor unhandled rejections
+});
+
+process.on('uncaughtException', (err) => {
+  console.error(`❌ [Uncaught Exception] Error: ${err.message}`);
+  console.error(err.stack);
+  server.close(() => {
+    process.exit(1);
+  });
 });
 
 module.exports = app;
