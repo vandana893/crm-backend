@@ -1,12 +1,22 @@
 const User = require('./auth.model');
+const Employee = require('../configuration/models/employee.model');
 
 const findByEmailOrUsername = async (identifier) => {
-  return User.findOne({ 
+  let user = await User.findOne({ 
     $or: [
       { email: identifier },
       { name: identifier }
     ]
   }).select('+password');
+
+  if (!user) {
+    const employee = await Employee.findOne({ username: identifier });
+    if (employee && employee.user) {
+      user = await User.findById(employee.user).select('+password');
+    }
+  }
+
+  return user;
 };
 
 const findById = async (id) => {
