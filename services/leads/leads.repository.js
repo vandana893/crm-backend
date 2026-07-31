@@ -55,35 +55,47 @@ const findByFilters = async (filters) => {
   return Lead.find(query).populate('owner', 'name role').sort({ createdAt: -1 });
 };
 
-const findFollowups = async () => {
+const findFollowups = async (ownerId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  return Lead.find({
+  const query = {
     response: 'Followup',
     callbackDate: { $gte: today, $lt: tomorrow },
     isBlocked: false,
-  }).populate('owner', 'name role');
+  };
+  if (ownerId) query.owner = ownerId;
+  return Lead.find(query).populate('owner', 'name role');
 };
 
-const findDisposed = async () => {
-  return Lead.find({
+const findDisposed = async (ownerId) => {
+  const query = {
     response: { $in: ['Not Interested', 'Disposed'] },
     isBlocked: false,
-  }).populate('owner', 'name role');
+  };
+  if (ownerId) query.owner = ownerId;
+  return Lead.find(query).populate('owner', 'name role');
 };
 
-const findRepeat = async () => {
-  return Lead.aggregate([
+const findRepeat = async (ownerId) => {
+  const pipeline = [];
+  if (ownerId) {
+    const mongoose = require('mongoose');
+    pipeline.push({ $match: { owner: new mongoose.Types.ObjectId(ownerId) } });
+  }
+  pipeline.push(
     { $group: { _id: '$mobile', count: { $sum: 1 }, leads: { $push: '$$ROOT' } } },
-    { $match: { count: { $gt: 1 } } },
-  ]);
+    { $match: { count: { $gt: 1 } } }
+  );
+  return Lead.aggregate(pipeline);
 };
 
-const findHotLeads = async () => {
-  return Lead.find({ type: 'Hot', isBlocked: false }).populate('owner', 'name role');
+const findHotLeads = async (ownerId) => {
+  const query = { type: 'Hot', isBlocked: false };
+  if (ownerId) query.owner = ownerId;
+  return Lead.find(query).populate('owner', 'name role');
 };
 
 const bulkCreate = async (leads) => {

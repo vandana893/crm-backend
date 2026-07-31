@@ -17,6 +17,10 @@ const getLeads = async (req, res, next) => {
       filters.createdAt = { $gte: new Date(req.query.fromDate), $lte: new Date(req.query.toDate) };
     }
 
+    if (req.user && req.user.role === 'employee') {
+      filters.owner = req.user.id;
+    }
+
     const { leads, total } = await leadsRepository.findAll(filters, { skip, limit });
     const pagination = getPaginationMeta(page, limit, total);
 
@@ -31,6 +35,11 @@ const getLeadById = async (req, res, next) => {
   try {
     const lead = await leadsRepository.findById(req.params.id);
     if (!lead) return errorResponse(res, 'Lead not found', 404);
+
+    if (req.user && req.user.role === 'employee') {
+      const ownerId = lead.owner?._id ? lead.owner._id.toString() : lead.owner?.toString();
+      if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
+    }
 
     return successResponse(res, 'Lead fetched', lead);
   } catch (error) {
@@ -51,8 +60,15 @@ const createLead = async (req, res, next) => {
 // PUT /api/leads/:id
 const updateLead = async (req, res, next) => {
   try {
+    const existingLead = await leadsRepository.findById(req.params.id);
+    if (!existingLead) return errorResponse(res, 'Lead not found', 404);
+
+    if (req.user && req.user.role === 'employee') {
+      const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
+      if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
+    }
+
     const lead = await leadsRepository.updateById(req.params.id, req.body);
-    if (!lead) return errorResponse(res, 'Lead not found', 404);
 
     return successResponse(res, 'Lead updated successfully', lead);
   } catch (error) {
@@ -63,8 +79,15 @@ const updateLead = async (req, res, next) => {
 // PATCH /api/leads/:id/comment
 const updateComment = async (req, res, next) => {
   try {
+    const existingLead = await leadsRepository.findById(req.params.id);
+    if (!existingLead) return errorResponse(res, 'Lead not found', 404);
+
+    if (req.user && req.user.role === 'employee') {
+      const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
+      if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
+    }
+
     const lead = await leadsRepository.updateComment(req.params.id, req.body.comment);
-    if (!lead) return errorResponse(res, 'Lead not found', 404);
 
     return successResponse(res, 'Comment updated', lead);
   } catch (error) {
@@ -75,8 +98,15 @@ const updateComment = async (req, res, next) => {
 // PATCH /api/leads/:id/response
 const updateLeadResponse = async (req, res, next) => {
   try {
+    const existingLead = await leadsRepository.findById(req.params.id);
+    if (!existingLead) return errorResponse(res, 'Lead not found', 404);
+
+    if (req.user && req.user.role === 'employee') {
+      const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
+      if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
+    }
+
     const lead = await leadsRepository.updateResponse(req.params.id, req.body.response);
-    if (!lead) return errorResponse(res, 'Lead not found', 404);
 
     return successResponse(res, 'Response updated', lead);
   } catch (error) {
@@ -87,8 +117,15 @@ const updateLeadResponse = async (req, res, next) => {
 // DELETE /api/leads/:id
 const deleteLead = async (req, res, next) => {
   try {
+    const existingLead = await leadsRepository.findById(req.params.id);
+    if (!existingLead) return errorResponse(res, 'Lead not found', 404);
+
+    if (req.user && req.user.role === 'employee') {
+      const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
+      if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
+    }
+
     const lead = await leadsRepository.deleteById(req.params.id);
-    if (!lead) return errorResponse(res, 'Lead not found', 404);
 
     return successResponse(res, 'Lead deleted successfully');
   } catch (error) {
@@ -99,7 +136,8 @@ const deleteLead = async (req, res, next) => {
 // GET /api/leads/followup
 const getFollowups = async (req, res, next) => {
   try {
-    const leads = await leadsRepository.findFollowups();
+    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const leads = await leadsRepository.findFollowups(ownerId);
     return successResponse(res, 'Follow-up leads fetched', leads);
   } catch (error) {
     next(error);
@@ -109,7 +147,8 @@ const getFollowups = async (req, res, next) => {
 // GET /api/leads/disposed
 const getDisposed = async (req, res, next) => {
   try {
-    const leads = await leadsRepository.findDisposed();
+    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const leads = await leadsRepository.findDisposed(ownerId);
     return successResponse(res, 'Disposed leads fetched', leads);
   } catch (error) {
     next(error);
@@ -119,7 +158,8 @@ const getDisposed = async (req, res, next) => {
 // GET /api/leads/repeat
 const getRepeat = async (req, res, next) => {
   try {
-    const leads = await leadsRepository.findRepeat();
+    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const leads = await leadsRepository.findRepeat(ownerId);
     return successResponse(res, 'Repeat leads fetched', leads);
   } catch (error) {
     next(error);
@@ -129,7 +169,8 @@ const getRepeat = async (req, res, next) => {
 // GET /api/leads/hot
 const getHotLeads = async (req, res, next) => {
   try {
-    const leads = await leadsRepository.findHotLeads();
+    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const leads = await leadsRepository.findHotLeads(ownerId);
     return successResponse(res, 'Hot leads fetched', leads);
   } catch (error) {
     next(error);
@@ -139,7 +180,11 @@ const getHotLeads = async (req, res, next) => {
 // POST /api/leads/export
 const exportLeads = async (req, res, next) => {
   try {
-    const leads = await leadsRepository.findByFilters(req.body);
+    const filters = req.body || {};
+    if (req.user && req.user.role === 'employee') {
+      filters.owner = req.user.id;
+    }
+    const leads = await leadsRepository.findByFilters(filters);
     return successResponse(res, 'Leads exported', leads);
   } catch (error) {
     next(error);
