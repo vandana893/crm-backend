@@ -17,7 +17,7 @@ const getLeads = async (req, res, next) => {
       filters.createdAt = { $gte: new Date(req.query.fromDate), $lte: new Date(req.query.toDate) };
     }
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       filters.owner = req.user.id;
     }
 
@@ -36,7 +36,7 @@ const getLeadById = async (req, res, next) => {
     const lead = await leadsRepository.findById(req.params.id);
     if (!lead) return errorResponse(res, 'Lead not found', 404);
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       const ownerId = lead.owner?._id ? lead.owner._id.toString() : lead.owner?.toString();
       if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
     }
@@ -63,7 +63,7 @@ const updateLead = async (req, res, next) => {
     const existingLead = await leadsRepository.findById(req.params.id);
     if (!existingLead) return errorResponse(res, 'Lead not found', 404);
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
       if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
     }
@@ -82,7 +82,7 @@ const updateComment = async (req, res, next) => {
     const existingLead = await leadsRepository.findById(req.params.id);
     if (!existingLead) return errorResponse(res, 'Lead not found', 404);
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
       if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
     }
@@ -101,7 +101,7 @@ const updateLeadResponse = async (req, res, next) => {
     const existingLead = await leadsRepository.findById(req.params.id);
     if (!existingLead) return errorResponse(res, 'Lead not found', 404);
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
       if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
     }
@@ -120,7 +120,7 @@ const deleteLead = async (req, res, next) => {
     const existingLead = await leadsRepository.findById(req.params.id);
     if (!existingLead) return errorResponse(res, 'Lead not found', 404);
 
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       const ownerId = existingLead.owner?._id ? existingLead.owner._id.toString() : existingLead.owner?.toString();
       if (ownerId !== req.user.id) return errorResponse(res, 'Access denied', 403);
     }
@@ -136,7 +136,7 @@ const deleteLead = async (req, res, next) => {
 // GET /api/leads/followup
 const getFollowups = async (req, res, next) => {
   try {
-    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const ownerId = req.user && req.user.role !== 'Admin' ? req.user.id : null;
     const leads = await leadsRepository.findFollowups(ownerId);
     return successResponse(res, 'Follow-up leads fetched', leads);
   } catch (error) {
@@ -147,7 +147,7 @@ const getFollowups = async (req, res, next) => {
 // GET /api/leads/disposed
 const getDisposed = async (req, res, next) => {
   try {
-    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const ownerId = req.user && req.user.role !== 'Admin' ? req.user.id : null;
     const leads = await leadsRepository.findDisposed(ownerId);
     return successResponse(res, 'Disposed leads fetched', leads);
   } catch (error) {
@@ -158,7 +158,7 @@ const getDisposed = async (req, res, next) => {
 // GET /api/leads/repeat
 const getRepeat = async (req, res, next) => {
   try {
-    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const ownerId = req.user && req.user.role !== 'Admin' ? req.user.id : null;
     const leads = await leadsRepository.findRepeat(ownerId);
     return successResponse(res, 'Repeat leads fetched', leads);
   } catch (error) {
@@ -169,7 +169,7 @@ const getRepeat = async (req, res, next) => {
 // GET /api/leads/hot
 const getHotLeads = async (req, res, next) => {
   try {
-    const ownerId = req.user && req.user.role === 'employee' ? req.user.id : null;
+    const ownerId = req.user && req.user.role !== 'Admin' ? req.user.id : null;
     const leads = await leadsRepository.findHotLeads(ownerId);
     return successResponse(res, 'Hot leads fetched', leads);
   } catch (error) {
@@ -181,7 +181,7 @@ const getHotLeads = async (req, res, next) => {
 const exportLeads = async (req, res, next) => {
   try {
     const filters = req.body || {};
-    if (req.user && req.user.role === 'employee') {
+    if (req.user && req.user.role !== 'Admin') {
       filters.owner = req.user.id;
     }
     const leads = await leadsRepository.findByFilters(filters);

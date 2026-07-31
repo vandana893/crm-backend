@@ -14,7 +14,7 @@ router.post('/export', auth, controller.exportLeads);
 // Standard CRUD
 router.get('/', auth, getLeadsRules, validate, controller.getLeads);
 router.get('/:id', auth, idParamRule, validate, controller.getLeadById);
-router.post('/', auth, authorize('admin'), createLeadRules, validate, controller.createLead);
+router.post('/', auth, authorize('Admin'), createLeadRules, validate, controller.createLead);
 router.put('/:id', auth, updateLeadRules, validate, controller.updateLead);
 router.patch('/:id/comment', auth, updateCommentRules, validate, controller.updateComment);
 router.patch('/:id/response', auth, updateResponseRules, validate, controller.updateLeadResponse);
