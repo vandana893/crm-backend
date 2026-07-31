@@ -9,6 +9,8 @@ router.get('/followup', auth, controller.getFollowups);
 router.get('/disposed', auth, controller.getDisposed);
 router.get('/repeat', auth, controller.getRepeat);
 router.get('/hot', auth, controller.getHotLeads);
+router.get('/fetchable', auth, controller.getFetchableLeads);
+router.patch('/fetch/:id', auth, idParamRule, validate, controller.fetchLead);
 router.post('/export', auth, controller.exportLeads);
 
 // Standard CRUD

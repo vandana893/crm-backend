@@ -102,8 +102,24 @@ const bulkCreate = async (leads) => {
   return Lead.insertMany(leads, { ordered: false });
 };
 
+const findFetchable = async (limit = 50) => {
+  return Lead.find({ owner: { $in: [null, undefined] }, isBlocked: false })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+};
+
+const assignLeadToUser = async (leadId, userId) => {
+  return Lead.findOneAndUpdate(
+    { _id: leadId, owner: { $in: [null, undefined] }, isBlocked: false },
+    { $set: { owner: userId } },
+    { new: true }
+  ).populate('owner', 'name role');
+};
+
 module.exports = {
   findAll, findById, create, updateById, deleteById,
   updateComment, updateResponse, findByFilters,
   findFollowups, findDisposed, findRepeat, findHotLeads, bulkCreate,
+  findFetchable, assignLeadToUser,
 };

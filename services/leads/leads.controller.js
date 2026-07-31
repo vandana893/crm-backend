@@ -191,8 +191,44 @@ const exportLeads = async (req, res, next) => {
   }
 };
 
+// GET /api/leads/fetchable
+const getFetchableLeads = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const leads = await leadsRepository.findFetchable(limit);
+    return successResponse(res, 'Fetchable leads retrieved successfully', leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PATCH /api/leads/fetch/:id
+const fetchLead = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role === 'Admin') {
+      return errorResponse(res, 'Only employees can fetch leads', 403);
+    }
+
+    const leadId = req.params.id;
+    const userId = req.user.id;
+
+    // Use atomic update to assign the lead
+    // If the lead was already assigned, this query will return null
+    const lead = await leadsRepository.assignLeadToUser(leadId, userId);
+
+    if (!lead) {
+      return errorResponse(res, 'Lead is no longer available or not found', 409);
+    }
+
+    return successResponse(res, 'Lead fetched successfully', lead);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getLeads, getLeadById, createLead, updateLead,
   updateComment, updateLeadResponse, deleteLead,
   getFollowups, getDisposed, getRepeat, getHotLeads, exportLeads,
+  getFetchableLeads, fetchLead,
 };

@@ -5,7 +5,7 @@ const leadSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'Lead owner is required'],
+      required: false,
     },
     clientName: {
       type: String,
