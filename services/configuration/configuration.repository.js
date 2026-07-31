@@ -166,21 +166,48 @@ const getGraphSales = async () => {
     dynamicProfileData.push({ name: 'No Data', count: 1, color: '#d1d5db' });
   }
 
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+  sixMonthsAgo.setDate(1);
+  sixMonthsAgo.setHours(0, 0, 0, 0);
+
+  const trendAgg = await Lead.aggregate([
+    { $match: { createdAt: { $gte: sixMonthsAgo } } },
+    { $group: { _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } }, count: { $sum: 1 } } },
+    { $sort: { '_id.year': 1, '_id.month': 1 } }
+  ]);
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dynamicTrendData = [];
+  
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const m = d.getMonth() + 1;
+    const y = d.getFullYear();
+    const match = trendAgg.find(t => t._id.year === y && t._id.month === m);
+    dynamicTrendData.push({ month: monthNames[m - 1], count: match ? match.count : 0 });
+  }
+
+  const leadSourceAgg = await Lead.aggregate([
+    { $match: { source: { $exists: true, $ne: null, $ne: '' } } },
+    { $group: { _id: '$source', count: { $sum: 1 } } }
+  ]);
+
+  const sourceColors = ['#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6', '#06b6d4'];
+  const dynamicLeadData = leadSourceAgg.map((item, index) => ({
+    name: item._id,
+    count: item.count,
+    color: sourceColors[index % sourceColors.length]
+  }));
+
+  if (dynamicLeadData.length === 0) {
+    dynamicLeadData.push({ name: 'No Data', count: 1, color: '#d1d5db' });
+  }
+
   return {
-    leadData: [
-      { name: 'Organic', count: 420, color: '#3b82f6' },
-      { name: 'Referral', count: 285, color: '#22c55e' },
-      { name: 'Direct', count: 145, color: '#eab308' },
-      { name: 'Social', count: 90, color: '#ef4444' }
-    ],
-    trendData: [
-      { month: 'Jan', count: 120 },
-      { month: 'Feb', count: 150 },
-      { month: 'Mar', count: 180 },
-      { month: 'Apr', count: 130 },
-      { month: 'May', count: 210 },
-      { month: 'Jun', count: 280 }
-    ],
+    leadData: dynamicLeadData,
+    trendData: dynamicTrendData,
     profileData: dynamicProfileData
   };
 };
