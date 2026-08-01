@@ -103,12 +103,8 @@ const bulkCreate = async (leads) => {
 };
 
 const findFetchable = async (limit = 50, userId) => {
-  const query = { isBlocked: false };
-  if (userId) {
-    query.owner = userId;
-  } else {
-    query.owner = { $in: [null, undefined] };
-  }
+  // Fetchable leads are unassigned leads
+  const query = { isBlocked: false, owner: { $in: [null, undefined] } };
   return Lead.find(query)
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -118,7 +114,7 @@ const findFetchable = async (limit = 50, userId) => {
 const assignLeadToUser = async (leadId, userId) => {
   return Lead.findOneAndUpdate(
     { _id: leadId, owner: { $in: [null, undefined, userId] }, isBlocked: false },
-    { $set: { owner: userId } },
+    { $set: { owner: userId, response: 'New' } },
     { new: true }
   ).populate('owner', 'name role');
 };
