@@ -195,7 +195,8 @@ const exportLeads = async (req, res, next) => {
 const getFetchableLeads = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
-    const leads = await leadsRepository.findFetchable(limit);
+    const userId = req.user ? req.user.id : null;
+    const leads = await leadsRepository.findFetchable(limit, userId);
     return successResponse(res, 'Fetchable leads retrieved successfully', leads);
   } catch (error) {
     next(error);
